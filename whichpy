@@ -48,6 +48,8 @@ do
       else
         SHEBANG="#!/usr/bin/env ${PYTHON}"
       fi
+      # If the first line of the script is a shebang, replace it with ours,
+      # otherwise, insert ours
       sed -i "1 {
                 s:#!.*:${SHEBANG}:
                 t
