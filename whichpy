@@ -1,0 +1,67 @@
+#!/bin/sh
+
+# Determine which python interpreter understands the given python file, and
+# depending on the given operation, print the interpreter, edit/insert the
+# file's shebang line, or run it with the interpreter.
+#
+# Example:
+#   whichpy shebang myscript.py python3 /usr/local/bin/python python2.7
+# 
+# Assume python3 fails to parse myscript.py while /usr/local/bin/python
+# succeeds, then myscript.py's shebang line is replaced with
+# "#!/usr/local/bin/python", or it is inserted if no shebang line was
+# present. If /usr/local/bin/python also fails but python2.7 succeeds,
+# the shebang line will be "#/usr/bin/env python2.7".
+# 
+# If any python interpreter succeeds to parse the script, whichpy returns
+# 0; otherwise it returns 1.
+
+usage()
+{
+  echo "Usage:"
+  echo "  $0 echo|shebang|run <script.py> python.."
+}
+
+OPERATION=$1
+SCRIPT=$2
+shift 2 || usage
+
+# Each argument after operation and script is a python interpreter
+for PYTHON
+do
+  # Check the script using the chosen python's compile() function
+  if $PYTHON -c "compile(open('${SCRIPT}').read(), '${SCRIPT}', 'exec')" \
+     >/dev/null 2>/dev/null
+  then
+    case $OPERATION in
+    echo)
+      echo $PYTHON
+      ;;
+    shebang)
+      # When the python command is an absolute path, use that path. otherwise,
+      # use /usr/bin/env with the relative path
+      if echo $PYTHON | grep '^/' > /dev/null
+      then
+        SHEBANG="#!${PYTHON}"
+      else
+        SHEBANG="#!/usr/bin/env ${PYTHON}"
+      fi
+      sed -i "1 {
+                s:#!.*:${SHEBANG}:
+                t
+                i${SHEBANG}\
+
+                }" $SCRIPT
+      ;; 
+    run)
+      $PYTHON $SCRIPT 
+      ;;
+    *)
+      usage
+    esac
+     
+    exit 0
+  fi
+done
+
+exit 1
