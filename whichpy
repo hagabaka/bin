@@ -15,6 +15,8 @@
 # 
 # If any python interpreter succeeds to parse the script, whichpy returns
 # 0; otherwise it returns 1.
+#
+# Check http://github.com/hagabaka/bin for updates or to contribute.
 
 usage()
 {
