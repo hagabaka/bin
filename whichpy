@@ -13,8 +13,9 @@
 # present. If /usr/local/bin/python also fails but python2.7 succeeds,
 # the shebang line will be "#/usr/bin/env python2.7".
 # 
-# If any python interpreter succeeds to parse the script, whichpy returns
-# 0; otherwise it returns 1.
+# If invalid arguments are given to whichpy, it returns 2. If any python
+# interpreter succeeds to parse the script, it returns 0; otherwise it
+# returns 1.
 #
 # Check http://github.com/hagabaka/bin for updates or to contribute.
 
@@ -22,6 +23,7 @@ usage()
 {
   echo "Usage:"
   echo "  $0 echo|shebang|run <script.py> python.."
+  exit 2
 }
 
 OPERATION=$1
